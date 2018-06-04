@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+
+  <head>
+    <meta charset="utf-8">
+    <title></title>
+    <style>
+      #map {
+        height: 600px;
+        width: 100%;
+       }
+       #w_icon{
+         padding: 20px;
+       }
+    </style>
+  </head>
+
+
+  <body>
+      <div id="map"></div>
+
+      <script>
+      var Weather;
+      
+      var uluru = {lat: 18.5119 , lng: 109.3625};
+      var map, marker;
+      var COORDS = {lat: 18.5122 , lng: 109.3570};
+      var InfoWindow;
+
+    const API_KEY = 'b08327efa0231dbc82c579fd38c988de';
+    var url = `http://api.openweathermap.org/data/2.5/weather?lat=${COORDS.lat}&lon=${COORDS.lng}&appid=${API_KEY}`;
+
+
+
+       function initMap() {
+         map = new google.maps.Map(document.getElementById('map'), {
+           zoom: 16,
+           center: uluru
+         });
+         marker = new google.maps.Marker({
+           position: uluru,
+           map: map,
+           draggable: true
+
+         });
+
+   google.maps.event.addListener(marker, 'dragend', function(COORDS) {
+
+     COORDS.lat = this.getPosition().lat();
+     COORDS.lng = this.getPosition().lng();
+     url = `http://api.openweathermap.org/data/2.5/weather?lat=${COORDS.lat}&lon=${COORDS.lng}&appid=${API_KEY}`;
+     InfoWindow.close();
+     getWeather(COORDS);
+
+});
+}
+
+function getWeather(COORDS) {
+ fetch(url)
+       .then(function(response) {
+         response.json().then(function(data) {
+            Weather = data;
+           console.log(data);
+           InfoWindow = new google.maps.InfoWindow({
+             content: data.weather[0].main + " "+ data.main.temp + `<img id="w_icon" src=http://openweathermap.org/img/w/${data.weather[0].icon}.png >`
+           });
+            InfoWindow.open(map, marker);
+
+
+
+         });
+     });
+}
+getWeather(COORDS);
+
+
+
+   </script>
+
+<script async defer
+
+     src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAB3g6M15tO2zQuC-rg-yNCAIqWyHaRjuM&callback=initMap">
+
+   </script>
+
+  </body>
+</html>
